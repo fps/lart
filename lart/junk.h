@@ -44,7 +44,7 @@ namespace lart
 	};
 
 	template<class T>
-	std::shared_ptr<junk<T>> make(const T& t = T())
+	std::shared_ptr<junk<T>> make_junk(const T& t = T())
 	{
 		return junk<T>::create(t);
 	}

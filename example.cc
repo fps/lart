@@ -8,6 +8,8 @@
 
 #include <jack/jack.h>
 
+#include <unistd.h>
+
 using namespace lart;
 
 /**
@@ -32,11 +34,24 @@ struct client
 	jack_client_t *m_jack_client;
 
 	client() :
-		m_oscillators(make(std::vector<oscillator>()))
+		m_oscillators(make_junk(std::vector<oscillator>()))
+	{
+
+	}
+
+	int process(jack_nframes_t nframes)
 	{
 
 	}
 };
+
+extern "C" 
+{
+	int process(jack_nframes_t nframes, void *arg)
+	{
+		return ((client*)arg)->process(nframes);
+	}
+}
 
 int main()
 {
@@ -46,5 +61,11 @@ int main()
 
 	auto t2 = rb.read();
 	t2->exec();
+
+	client c;
+	while(true)
+	{
+		
+	}
 }
 
