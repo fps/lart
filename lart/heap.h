@@ -4,13 +4,13 @@
 #include <list>
 #include <iostream>
 
-#include "disposable_base.h"
+#include "junk_base.h"
 
 namespace lart
 {
 
 	struct heap {
-		std::list<disposable_base_ptr> disposables;
+		std::list<junk_base_ptr> junks;
 	
 		static heap* instance;
 	
@@ -21,19 +21,19 @@ namespace lart
 	
 		template <class T>
 		T add(T d) {
-			disposables.push_back(d);
+			junks.push_back(d);
 			return d;
 		}
 	
 		/**
 			Note that this function has to be called in the same thread that writes commands, otherwise
-			references might go away between the construction of a disposable and binding it to a functor
+			references might go away between the construction of a junk and binding it to a functor
 			that uses it.
 		*/
 		void cleanup() {
-			for (auto it = disposables.begin(); it != disposables.end();) {
+			for (auto it = junks.begin(); it != junks.end();) {
 				if (it->unique()) {
-					it = disposables.erase(it);
+					it = junks.erase(it);
 				} else {
 					++it;
 				}

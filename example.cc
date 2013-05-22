@@ -4,7 +4,7 @@
 
 #include <lart/ringbuffer.h>
 #include <lart/op.h>
-#include <lart/disposable.h>
+#include <lart/junk.h>
 
 #include <jack/jack.h>
 
@@ -18,7 +18,7 @@ struct oscillator
 	float m_freq;
 };
 
-typedef std::shared_ptr<disposable<std::vector<oscillator>>> oscillators;
+typedef std::shared_ptr<junk<std::vector<oscillator>>> oscillators;
 
 extern "C" 
 {
