@@ -8,38 +8,47 @@
 
 #include <iostream>
 
-/**
-	@brief The base class for all things to be managed by the heap.
-
-	See heap.h for more details.
-*/
-template <class T>
-struct disposable : public disposable_base {
-	T t;
-
+namespace lart
+{
 	/**
-		The only way to create a disposable<T> is by using this create() method
+		@brief The base class for all things to be managed by the heap.
+	
+		See heap.h for more details.
 	*/
-	static disposable_base_ptr create(const T& t = T()) 
-	{
-		return std::make_shared (
-			heap::get()->add(
-				std::make_shared(new disposable<T>(t))
-			)
-		);
-	}
-
-
-	virtual ~disposable() { /* std::cout << "~disposable()" << std::endl; */ }
-
-	private:
+	template <class T>
+	struct disposable : public disposable_base {
+		T t;
+	
 		/**
-			Force creation on the heap by making the constructor private.
+			The only way to create a disposable<T> is by using this create() method
 		*/
-		disposable(const T &t = T()) : t(t) { 
-			// std::cout << "disposable()" << std::endl;
+		static std::shared_ptr<disposable<T>> create(const T& t = T()) 
+		{
+			return std::shared_ptr<disposable<T>> (
+				heap::get()->add(
+					std::shared_ptr<disposable<T>>(new disposable<T>(t))
+				)
+			);
 		}
-};
+	
+	
+		virtual ~disposable() { /* std::cout << "~disposable()" << std::endl; */ }
+	
+		private:
+			/**
+				Force creation on the heap by making the constructor private.
+			*/
+			disposable(const T &t = T()) : t(t) { 
+				// std::cout << "disposable()" << std::endl;
+			}
+	};
+
+	template<class T>
+	std::shared_ptr<disposable<T>> make(const T& t = T())
+	{
+		return disposable<T>::create(t);
+	}
+}
 
 
 #endif
