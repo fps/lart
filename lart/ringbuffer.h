@@ -70,6 +70,12 @@ struct ringbuffer {
 		jack_ringbuffer_read_advance(jack_ringbuffer, sizeof(T));
 		return t;
 	}
+
+	T& snoop() {
+		jack_ringbuffer_data_t rb_data[2];
+		jack_ringbuffer_get_read_vector(jack_ringbuffer, rb_data);
+		return *((T*)rb_data->buf);
+	}
 };
 
 #endif
