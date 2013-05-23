@@ -99,22 +99,25 @@ extern "C"
 
 int main()
 {
-	client c;
-
-	/**
-		Repeatedly change the state drastically by creating some
-		new objects. These replace the old objects in the client.
-	*/
-	for (unsigned index = 0; index < 10; ++index)
 	{
-		std::vector<oscillator> v(10);
+		client c;
+	
+		/**
+			Repeatedly change the state drastically by creating some
+			new objects. These replace the old objects in the client.
+		*/
+		for (unsigned index = 0; index < 10; ++index)
 		{
-			oscillators o = make_junk(v);
-			c.m_ops.write([o, &c]() mutable  { c.m_oscillators = o; o = oscillators(); });
+			{
+				std::vector<oscillator> v(10);
+				oscillators o = make_junk(v);
+				c.m_ops.write([o, &c]() mutable  { c.m_oscillators = o; o = oscillators(); });
+			}
+
+			usleep(1000000);
+			std::cout << "cleanup" << std::endl;
+			heap::get()->cleanup();
 		}
-		usleep(1000000);
-		std::cout << "cleanup" << std::endl;
-		heap::get()->cleanup();
 	}
 
 	delete heap::get();
