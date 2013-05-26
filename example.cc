@@ -113,10 +113,9 @@ struct client
 		jack_nframes_t samplerate = jack_get_sample_rate(m_jack_client);
 		float delta_t = 1.0f/samplerate;
 		
-		for (size_t index = 0; index < oscillators.size(); ++index)
+		for (auto osc_it = oscillators.begin(); osc_it != oscillators.end(); ++osc_it)
 		{
-			//! Get a reference to the oscillator so we don't call operator[] all the time.
-			oscillator &o = oscillators[index];
+			oscillator &o = (*osc_it);
 			
 			for (jack_nframes_t frame = 0; frame < nframes; ++frame)
 			{
