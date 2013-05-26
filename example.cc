@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <vector>
 #include <functional>
+#include <cmath>
 
 #include <lart/heap.h>
 #include <lart/ringbuffer.h>
@@ -15,14 +16,22 @@
 using namespace lart;
 
 /**
-	An oscillator is represented by this struct XD
+	An oscillator is represented by this struct..
 */
 struct oscillator
 {
+	float m_time;
 	float m_freq;
+	
+	oscillator() :
+		m_time(0.0f),
+		m_freq(440.0f)
+	{
+		
+	}
 };
 
-typedef std::shared_ptr<junk<std::vector<oscillator>>> oscillators;
+typedef std::shared_ptr<junk<std::vector<oscillator>>> oscillators_ptr;
 
 extern "C" 
 {
@@ -37,20 +46,22 @@ extern "C"
 */
 struct client
 {
+	lart::heap m_heap;
+	
 	//! A variable number of oscillators.
-	oscillators m_oscillators;
+	oscillators_ptr m_oscillators;
 
 	jack_client_t *m_jack_client;
 	jack_port_t *m_jack_port;
 
 	//! The ringbuffer we use to pass commands through
 	//! to the realtime process thread.
-	ringbuffer<std::function<void()>> m_ops;
+	ringbuffer<std::function<void()>> m_commands;
 
 	//! Initialize the list of oscillators with a junky vector.
-	client(std::shared_ptr<heap> h) :
-		m_oscillators(h->add(std::vector<oscillator>())),
-		m_ops(1024)
+	client() :
+		m_oscillators(m_heap.add(std::vector<oscillator>())),
+		m_commands(1024)
 	{
 		std::cout << "client: hi" << std::endl;
 
@@ -78,12 +89,41 @@ struct client
 
 	int process(jack_nframes_t nframes)
 	{
-		while (m_ops.can_read())
+		//! Execute commands stored in the commands ringbuffer.
+		while (m_commands.can_read())
 		{
-			m_ops.snoop()();
-			m_ops.read();
+			//! snoop() returns a reference to the T on the front of the ringbuffer without copying.
+			m_commands.snoop()();
+			
+			//! read_advance advances the read pointer of the ringbuffer without copying.
+			m_commands.read_advance();
 		}
 
+		float * buffer = (float*)jack_port_get_buffer(m_jack_port, nframes);
+		
+		std::fill(buffer, buffer + nframes, 0.0f);
+		
+		//! Get a reference to the oscillators vector to save some typing..
+		std::vector<oscillator> &oscillators = m_oscillators->t;
+		
+		unsigned number_of_oscillators = oscillators.size();
+		float normalization = 1.0f/number_of_oscillators;
+		
+		jack_nframes_t samplerate = jack_get_sample_rate(m_jack_client);
+		float delta_t = 1.0f/samplerate;
+		
+		for (size_t index = 0; index < oscillators.size(); ++index)
+		{
+			//! Get a reference to the oscillator so we don't call operator[] all the time.
+			oscillator &o = oscillators[index];
+			
+			for (jack_nframes_t frame = 0; frame < nframes; ++frame)
+			{
+				buffer[frame] += normalization * sin(2.0 * M_PI * o.m_freq * o.m_time);
+				o.m_time += delta_t;
+			}
+		}
+		
 		return 0;
 	}
 };
@@ -99,25 +139,23 @@ extern "C"
 
 int main()
 {
-	auto h = make_heap();
-	
-	client c(h);
+	client c;
 
 	/**
 		Repeatedly change the state drastically by creating some
 		new objects. These replace the old objects in the client.
 	*/
-	for (unsigned index = 0; index < 10; ++index)
+	for (unsigned index = 0; index < 30; ++index)
 	{
 		{
-			std::vector<oscillator> v(10);
-			auto o = h->add(v);
-			c.m_ops.write([o, &c]() mutable  { c.m_oscillators = o; o = oscillators(); });
+			std::vector<oscillator> v(3);
+			auto o = c.m_heap.add(v);
+			c.m_commands.write([o, &c]() mutable  { c.m_oscillators = o; o = oscillators_ptr(); });
 		}
 
 		usleep(1000000);
 		std::cout << "cleanup" << std::endl;
-		h->cleanup();
+		c.m_heap.cleanup();
 		usleep(1000000);
 	}
 }

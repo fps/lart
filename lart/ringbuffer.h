@@ -66,6 +66,11 @@ namespace lart
 			return false;
 		}
 
+		void read_advance()
+		{
+			jack_ringbuffer_read_advance(jack_ringbuffer, sizeof(T));
+		}
+		
 		T read() {
 			jack_ringbuffer_data_t rb_data[2];
 			jack_ringbuffer_get_read_vector(jack_ringbuffer, rb_data);
