@@ -23,9 +23,10 @@ struct oscillator
 	float m_time;
 	float m_freq;
 	
+	//! Create an oscillator with a rather random frequency.
 	oscillator() :
 		m_time(0.0f),
-		m_freq(440.0f)
+		m_freq(220.0 + 880.0 * (float)rand() / (float)RAND_MAX)
 	{
 		
 	}
