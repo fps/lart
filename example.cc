@@ -147,18 +147,21 @@ int main()
 		Repeatedly change the state drastically by creating some
 		new objects. These replace the old objects in the client.
 	*/
-	for (unsigned index = 0; index < 30; ++index)
+	for (unsigned index = 0; index < 100; ++index)
 	{
 		{
 			std::vector<oscillator> v(8);
 			auto o = c.m_heap.add(v);
-			c.m_commands.write([o, &c]() mutable  { c.m_oscillators = o; o = oscillators_ptr(); });
+			if (c.m_commands.can_write())
+			{
+				c.m_commands.write([o, &c]() mutable  { c.m_oscillators = o; o = oscillators_ptr(); });
+			}
 		}
 
-		usleep(1000000);
+		usleep(30000);
 		std::cout << "cleanup" << std::endl;
 		c.m_heap.cleanup();
-		usleep(1000000);
+		usleep(30000);
 	}
 	
 	return EXIT_SUCCESS;
