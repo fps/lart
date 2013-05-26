@@ -1,26 +1,15 @@
-#ifndef DISPOSABLE_HH
-#define DISPOSABLE_HH
+#ifndef LART_JUNK_HH
+#define LART_JUNK_HH
 
 #include <memory>
 
-#include "junk_base.h"
-#include "heap.h"
+#include <lart/heap.h>
+#include <lart/junk_base.h>
 
 #include <iostream>
 
 namespace lart
 {
-	/**
-		@brief The base class for all junk types.
-	
-		See junk.h for more information.
-	*/
-	struct junk_base {
-		virtual ~junk_base() { }
-	};
-	
-	typedef std::shared_ptr<junk_base> junk_base_ptr;
-	
 	/**
 		@brief The base class for all things to be managed by the heap.
 	

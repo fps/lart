@@ -5,7 +5,6 @@
 #include <functional>
 
 #include <lart/ringbuffer.h>
-#include <lart/op.h>
 #include <lart/junk.h>
 
 #include <jack/jack.h>
