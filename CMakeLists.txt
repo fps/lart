@@ -47,16 +47,13 @@ pkg_check_modules(JACK jack)
 
 include_directories(${PROJECT_SOURCE_DIR})
 
-add_library(lart lart/heap.cc)
-target_link_libraries(lart ${JACK_LIBRARIES})
-
 add_executable(example example.cc)
-target_link_libraries(example lart)
+target_link_libraries(example ${JACK_LIBRARIES})
 
 #
 # INSTALL
 #
 
-install(TARGETS lart RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
+# install(TARGETS lart RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 install(FILES lart/heap.h lart/junk_base.h lart/junk.h lart/ringbuffer.h DESTINATION include/lart)
 

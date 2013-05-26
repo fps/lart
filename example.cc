@@ -4,6 +4,7 @@
 #include <vector>
 #include <functional>
 
+#include <lart/heap.h>
 #include <lart/ringbuffer.h>
 #include <lart/junk.h>
 
@@ -47,8 +48,8 @@ struct client
 	ringbuffer<std::function<void()>> m_ops;
 
 	//! Initialize the list of oscillators with a junky vector.
-	client() :
-		m_oscillators(make_junk(std::vector<oscillator>())),
+	client(std::shared_ptr<heap> h) :
+		m_oscillators(h->add(std::vector<oscillator>())),
 		m_ops(1024)
 	{
 		std::cout << "client: hi" << std::endl;
@@ -98,27 +99,25 @@ extern "C"
 
 int main()
 {
-	{
-		client c;
+	auto h = std::make_shared<lart::heap>();
 	
-		/**
-			Repeatedly change the state drastically by creating some
-			new objects. These replace the old objects in the client.
-		*/
-		for (unsigned index = 0; index < 10; ++index)
+	client c(h);
+
+	/**
+		Repeatedly change the state drastically by creating some
+		new objects. These replace the old objects in the client.
+	*/
+	for (unsigned index = 0; index < 10; ++index)
+	{
 		{
-			{
-				std::vector<oscillator> v(10);
-				oscillators o = make_junk(v);
-				c.m_ops.write([o, &c]() mutable  { c.m_oscillators = o; o = oscillators(); });
-			}
-
-			usleep(1000000);
-			std::cout << "cleanup" << std::endl;
-			heap::get()->cleanup();
+			std::vector<oscillator> v(10);
+			auto o = h->add(v);
+			c.m_ops.write([o, &c]() mutable  { c.m_oscillators = o; o = oscillators(); });
 		}
-	}
 
-	delete heap::get();
+		usleep(1000000);
+		std::cout << "cleanup" << std::endl;
+		h->cleanup();
+	}
 }
 

@@ -4,25 +4,23 @@
 #include <list>
 #include <iostream>
 
-#include <lart/junk_base.h>
+#include <lart/junk.h>
 
 namespace lart
 {
 
 	struct heap {
-		std::list<junk_base_ptr> junks;
+		std::list<junk_base_ptr> m_junk;
 	
-		static heap* instance;
-	
-		static heap* get() {
-			if (instance) return instance;
-			return (instance = new heap());
-		}
+		heap() { }
+
+		virtual ~heap() { }
 	
 		template <class T>
-		T add(T d) {
-			junks.push_back(d);
-			return d;
+		std::shared_ptr<junk<T>> add(T t) {
+			auto ret = std::make_shared<junk<T>>(t);
+			m_junk.push_back(ret);
+			return ret;
 		}
 	
 		/**
@@ -30,21 +28,18 @@ namespace lart
 			references might go away between the construction of a junk and binding it to a functor
 			that uses it.
 		*/
-		void cleanup() {
-			for (auto it = junks.begin(); it != junks.end();) {
+		virtual void cleanup() {
+			for (auto it = m_junk.begin(); it != m_junk.end();) {
 				if (it->unique()) {
-					it = junks.erase(it);
+					it = m_junk.erase(it);
 				} else {
 					++it;
 				}
 			}	
 		}
-	
-		~heap() { instance = 0; }
-	
-		protected:
-			heap() { }
 	};
+	
+	typedef std::shared_ptr<heap> heap_ptr;
 }
 	
 
