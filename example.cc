@@ -118,6 +118,7 @@ int main()
 		usleep(1000000);
 		std::cout << "cleanup" << std::endl;
 		h->cleanup();
+		usleep(1000000);
 	}
 }
 

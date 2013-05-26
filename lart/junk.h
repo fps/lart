@@ -2,8 +2,9 @@
 #define LART_JUNK_HH
 
 #include <memory>
-
 #include <iostream>
+
+#include <pthread.h>
 
 namespace lart
 {
@@ -26,15 +27,15 @@ namespace lart
 	template <class T>
 	struct junk : public junk_base {
 		T t;
-
-		virtual ~junk() 
-		{
-			std::cout << "~junk()" << std::endl;
-		}
 	
 		junk(const T &t = T()) : t(t) 
 		{ 
-			std::cout << "junk()" << std::endl;
+			std::cout << "junk(): " << this << " " << pthread_self() << std::endl;
+		}
+
+		virtual ~junk() 
+		{
+			std::cout << "~junk(): " << this << " " << pthread_self() << std::endl;
 		}
 	};
 }
