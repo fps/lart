@@ -22,7 +22,7 @@ namespace lart
 		typedef std::shared_ptr<junk<T>> junk_ptr;
 
 		/**
-			The only way to create a junk<T> is by using this create() method
+			@brief The only way to create a junk<T> is by using this create() method
 		*/
 		static junk_ptr create(const T& t = T()) 
 		{
@@ -34,17 +34,20 @@ namespace lart
 		}
 	
 	
-		virtual ~junk() {  std::cout << "~junk()" << std::endl;  }
+		virtual ~junk() { /* std::cout << "~junk()" << std::endl; */ }
 	
 		private:
 			/**
-				Force creation on the heap by making the constructor private.
+				@brief Force creation on the heap by making the constructor private.
 			*/
 			junk(const T &t = T()) : t(t) { 
-				std::cout << "junk()" << std::endl;
+				/* std::cout << "junk()" << std::endl; */
 			}
 	};
 
+	/**
+	 * @brief A utility function so the compiler can infer the type of T from the argument.
+	 */
 	template<class T>
 	typename junk<T>::junk_ptr make_junk(const T& t = T())
 	{
