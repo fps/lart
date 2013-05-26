@@ -139,6 +139,8 @@ extern "C"
 
 int main()
 {
+	std::cout << "Hi! This is thread: " << pthread_self() << std::endl;
+	
 	client c;
 
 	/**
@@ -148,7 +150,7 @@ int main()
 	for (unsigned index = 0; index < 30; ++index)
 	{
 		{
-			std::vector<oscillator> v(3);
+			std::vector<oscillator> v(8);
 			auto o = c.m_heap.add(v);
 			c.m_commands.write([o, &c]() mutable  { c.m_oscillators = o; o = oscillators_ptr(); });
 		}
