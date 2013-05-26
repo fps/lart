@@ -30,12 +30,12 @@ namespace lart
 	
 		junk(const T &t = T()) : t(t) 
 		{ 
-			std::cout << "junk(): " << this << " " << pthread_self() << std::endl;
+			//std::cout << "junk(): " << this << " " << pthread_self() << std::endl;
 		}
 
 		virtual ~junk() 
 		{
-			std::cout << "~junk(): " << this << " " << pthread_self() << std::endl;
+			//std::cout << "~junk(): " << this << " " << pthread_self() << std::endl;
 		}
 	};
 }

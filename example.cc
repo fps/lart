@@ -13,8 +13,6 @@
 
 #include <unistd.h>
 
-using namespace lart;
-
 /**
 	An oscillator is represented by this struct..
 */
@@ -32,7 +30,7 @@ struct oscillator
 	}
 };
 
-typedef std::shared_ptr<junk<std::vector<oscillator>>> oscillators_ptr;
+typedef std::shared_ptr<lart::junk<std::vector<oscillator>>> oscillators_ptr;
 
 extern "C" 
 {
@@ -57,7 +55,7 @@ struct client
 
 	//! The ringbuffer we use to pass commands through
 	//! to the realtime process thread.
-	ringbuffer<std::function<void()>> m_commands;
+	lart::ringbuffer<std::function<void()>> m_commands;
 
 	//! Initialize the list of oscillators with a junky vector.
 	client() :
@@ -150,19 +148,27 @@ int main()
 	for (unsigned index = 0; index < 100; ++index)
 	{
 		{
-			std::vector<oscillator> v(8);
-			auto o = c.m_heap.add(v);
+			auto o = c.m_heap.add(std::vector<oscillator>(8));
+			
 			if (c.m_commands.can_write())
 			{
+				std::cout << "Writing update command..." << std::endl;
+				
 				c.m_commands.write([o, &c]() mutable  { c.m_oscillators = o; o = oscillators_ptr(); });
+			}
+			else
+			{
+				std::cout << "Couldn't write update command..." << std::endl;
 			}
 		}
 
 		usleep(30000);
-		std::cout << "cleanup" << std::endl;
+		std::cout << "Cleaning up some stuff..." << std::endl;
 		c.m_heap.cleanup();
 		usleep(30000);
 	}
+	
+	std::cout << "Leaving..." << std::endl;
 	
 	return EXIT_SUCCESS;
 }

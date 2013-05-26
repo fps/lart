@@ -8,10 +8,9 @@
 
 namespace lart
 {
-
 	struct heap {
 		std::list<junk_base_ptr> m_junk;
-	
+
 		heap() { }
 
 		virtual ~heap() { }
