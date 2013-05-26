@@ -15,7 +15,12 @@ namespace lart
 		heap() { }
 
 		virtual ~heap() { }
-	
+
+		/**
+			@brief Add a T to the heap.
+			
+			Returns a std::shared_ptr<junk<T>> with a reference count of 2 since it is also stored on the heap.
+		*/
 		template <class T>
 		std::shared_ptr<junk<T>> add(T t) {
 			auto ret = std::make_shared<junk<T>>(t);
@@ -24,6 +29,8 @@ namespace lart
 		}
 	
 		/**
+			@brief Iterate over list of junk and remove those with reference count == 1.
+			
 			Note that this function has to be called in the same thread that writes commands, otherwise
 			references might go away between the construction of a junk and binding it to a functor
 			that uses it.
@@ -40,6 +47,14 @@ namespace lart
 	};
 	
 	typedef std::shared_ptr<heap> heap_ptr;
+	
+	/**
+		@brief Utility function to save some keystrokes.
+	*/
+	heap_ptr make_heap()
+	{
+		return std::make_shared<heap>();
+	}
 }
 	
 

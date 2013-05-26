@@ -99,7 +99,7 @@ extern "C"
 
 int main()
 {
-	auto h = std::make_shared<lart::heap>();
+	auto h = make_heap();
 	
 	client c(h);
 
