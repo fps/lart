@@ -159,5 +159,7 @@ int main()
 		c.m_heap.cleanup();
 		usleep(1000000);
 	}
+	
+	return EXIT_SUCCESS;
 }
 
