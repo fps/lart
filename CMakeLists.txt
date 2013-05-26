@@ -55,5 +55,5 @@ target_link_libraries(example ${JACK_LIBRARIES})
 #
 
 # install(TARGETS lart RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
-install(FILES lart/heap.h lart/junk_base.h lart/junk.h lart/ringbuffer.h DESTINATION include/lart)
+install(FILES lart/heap.h lart/junk.h lart/ringbuffer.h DESTINATION include/lart)
 
