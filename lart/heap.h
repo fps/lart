@@ -21,7 +21,7 @@ namespace lart
 			Returns a std::shared_ptr<junk<T>> with a reference count of 2 since it is also stored on the heap.
 		*/
 		template <class T>
-		std::shared_ptr<junk<T>> add(T t) {
+		std::shared_ptr<junk<T>> add(const T &t) {
 			auto ret = std::make_shared<junk<T>>(t);
 			m_junk.push_back(ret);
 			return ret;
@@ -50,7 +50,7 @@ namespace lart
 	/**
 		@brief Utility function to save some keystrokes.
 	*/
-	heap_ptr make_heap()
+	inline heap_ptr make_heap()
 	{
 		return std::make_shared<heap>();
 	}
